@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="입결 계산기">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>홍대 네오캣 기초디자인반 수능 입결 계산기</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f5f5f5;
+  --card:#fff;
+  --border:#e8e8e8;
+  --text:#1a1a1a;
+  --sub:#666;
+  --muted:#aaa;
+  --accent:#1a1a1a;
+  --tag-bg:#f0f0f0;
+  --radius:14px;
+  --radius-sm:8px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100%;
+  font-size:16px;
+  /* prevent double-tap zoom */
+  touch-action:manipulation;
+}
+.wrap{
+  max-width:600px;
+  margin:0 auto;
+  padding:1.25rem 1rem calc(2rem + var(--safe-bottom));
+}
+
+/* 헤더 */
+.app-header{
+  text-align:center;
+  padding:1rem 0 1.25rem;
+}
+.app-header h1{
+  font-size:17px;
+  font-weight:700;
+  color:var(--text);
+  line-height:1.4;
+}
+.app-header p{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+/* 섹션 레이블 */
+.sec{
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  margin:1.25rem 0 .5rem;
+}
+
+/* 카드 */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:1rem;
+  margin-bottom:.75rem;
+}
+
+/* 탭 */
+.tabs{
+  display:flex;
+  background:var(--tag-bg);
+  border-radius:var(--radius-sm);
+  padding:3px;
+  margin-bottom:1rem;
+}
+.tab{
+  flex:1;
+  padding:9px 0;
+  font-size:14px;
+  font-weight:500;
+  text-align:center;
+  cursor:pointer;
+  background:transparent;
+  border:none;
+  border-radius:6px;
+  color:var(--sub);
+  transition:all .15s;
+}
+.tab.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+/* 성적 입력 그리드 */
+.sg{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.sc label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--sub);
+  margin-bottom:5px;
+}
+.sc input{
+  width:100%;
+  font-size:16px; /* 16px 미만이면 iOS에서 zoom 발생 */
+  padding:10px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:#fafafa;
+  color:var(--text);
+  -webkit-appearance:none;
+}
+.sc input:focus{outline:none;border-color:var(--accent);}
+.er{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+}
+.er label{
+  font-size:13px;
+  font-weight:600;
+  color:var(--sub);
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.er select{
+  flex:1;
+  font-size:16px;
+  padding:10px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:#fafafa;
+  color:var(--text);
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:36px;
+}
+.er select:focus{outline:none;border-color:var(--accent);}
+.std-notice{
+  font-size:12px;
+  color:#b06000;
+  background:#fff8ec;
+  border-radius:var(--radius-sm);
+  padding:.65rem .875rem;
+  margin-bottom:1rem;
+  line-height:1.6;
+  border-left:3px solid #f0a830;
+}
+
+/* 학교 선택 */
+.search-row{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;}
+.search-input{
+  flex:1;
+  font-size:16px;
+  padding:10px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:#fafafa;
+  color:var(--text);
+  -webkit-appearance:none;
+}
+.search-input:focus{outline:none;border-color:var(--accent);}
+.sel-info{font-size:12px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.ctrl-btns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-bottom:.75rem;
+}
+.ctrl-btn{
+  font-size:13px;
+  font-weight:500;
+  padding:9px 8px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:transparent;
+  color:var(--sub);
+  cursor:pointer;
+  text-align:center;
+}
+.ctrl-btn:active{background:var(--tag-bg);}
+
+/* 학교 토글 태그 */
+.tags{display:flex;flex-wrap:wrap;gap:8px;}
+.utag{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:8px 14px;
+  border:1.5px solid var(--border);
+  border-radius:20px;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:500;
+  color:var(--sub);
+  background:var(--tag-bg);
+  transition:all .15s;
+  user-select:none;
+  /* 모바일: 최소 터치 영역 */
+  min-height:38px;
+}
+.utag .dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.utag.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.utag.on .dot{opacity:1;}
+.utag.hidden{display:none;}
+.no-result{font-size:13px;color:var(--muted);padding:.5rem 0;}
+
+/* 미리보기 */
+.preview-area{display:flex;flex-direction:column;gap:8px;margin-top:.5rem;}
+.preview-item{
+  border:1px solid var(--border);
+  border-left-width:3px;
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.preview-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 14px;
+  background:#fafafa;
+  cursor:pointer;
+  user-select:none;
+  min-height:52px;
+}
+.preview-header-left{flex:1;min-width:0;}
+.preview-univ{font-size:14px;font-weight:700;color:var(--text);}
+.preview-formula{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.score-tag{
+  display:inline-block;
+  font-size:10px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:4px;
+  margin-top:5px;
+}
+.score-tag.pct{background:#e8f5e2;color:#2d6a1a;}
+.score-tag.std{background:#e3eefb;color:#1a4a8c;}
+.preview-chevron{font-size:12px;color:var(--muted);flex-shrink:0;margin-left:10px;}
+.preview-body{padding:12px 14px;display:none;background:#fff;overflow-x:auto;}
+.preview-body.open{display:block;}
+
+/* 학과 테이블 — 모바일 스크롤 가능 */
+.dept-group-label{
+  font-size:11px;font-weight:700;color:var(--sub);
+  margin:10px 0 4px;padding-left:2px;
+}
+.dept-group-label:first-child{margin-top:0;}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.dept-table{
+  width:100%;min-width:340px;
+  border-collapse:collapse;font-size:11px;table-layout:fixed;
+}
+.dept-table th{
+  text-align:center;padding:5px 6px;
+  color:var(--muted);font-weight:700;
+  border-bottom:1px solid #f0f0f0;border-top:1px solid #f0f0f0;
+  background:#fafafa;white-space:nowrap;
+}
+.dept-table th.ta-l{text-align:left;}
+.dept-table td{
+  padding:6px 6px;color:var(--sub);
+  border-bottom:1px solid #f8f8f8;
+  text-align:center;vertical-align:middle;
+}
+.dept-table td.ta-l{text-align:left;}
+.dept-table tr:last-child td{border-bottom:none;}
+
+/* 영어 등급표 */
+.eng-grade-table-wrap{margin-top:10px;}
+.eng-grade-label{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:5px;}
+.eng-grade-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.eng-grade-table{
+  min-width:360px;
+  border-collapse:collapse;font-size:11px;table-layout:fixed;
+}
+.eng-grade-table th{
+  text-align:center;padding:5px 3px;color:var(--muted);font-weight:700;
+  border-bottom:1px solid #f0f0f0;border-top:1px solid #f0f0f0;background:#fafafa;
+}
+.eng-grade-table td{
+  padding:5px 3px;color:var(--sub);
+  border-bottom:1px solid #f8f8f8;text-align:center;
+}
+.eng-grade-table tr:last-child td{border-bottom:none;}
+
+.asterisk-note{
+  font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6;
+  padding:7px 10px;background:#fafafa;border-radius:6px;border-left:2px solid #ddd;
+}
+
+/* 계산 버튼 */
+.btn-calc{
+  width:100%;padding:15px;
+  font-size:16px;font-weight:700;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:var(--radius);
+  cursor:pointer;margin-top:1rem;
+  -webkit-appearance:none;
+  transition:opacity .15s;
+}
+.btn-calc:active{opacity:.8;}
+
+/* 결과 카드 */
+.ri{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:.875rem 1rem;
+  background:#fff;
+  border:1px solid var(--border);border-left-width:3px;
+  border-radius:var(--radius);
+  margin-bottom:8px;
+}
+/* 컬러바 */
+.ri.c0{border-left-color:#7F77DD}.ri.c1{border-left-color:#1D9E75}.ri.c2{border-left-color:#D85A30}
+.ri.c3{border-left-color:#D4537E}.ri.c4{border-left-color:#378ADD}.ri.c5{border-left-color:#639922}
+.ri.c6{border-left-color:#BA7517}.ri.c7{border-left-color:#888780}.ri.c8{border-left-color:#533AB7}
+.ri.c9{border-left-color:#0F6E56}.ri.c10{border-left-color:#993C1D}.ri.c11{border-left-color:#185FA5}
+.ri.c12{border-left-color:#D4537E}.ri.c13{border-left-color:#5DCAA5}.ri.c14{border-left-color:#EF9F27}
+.ri.c15{border-left-color:#E24B4A}.ri.c16{border-left-color:#7F77DD}.ri.c17{border-left-color:#1D9E75}
+.ri.c18{border-left-color:#BA7517}.ri.c19{border-left-color:#378ADD}
+.ri.c20{border-left-color:#533AB7}.ri.c21{border-left-color:#0F6E56}.ri.c22{border-left-color:#D85A30}
+.ri.c23{border-left-color:#185FA5}.ri.c24{border-left-color:#D4537E}.ri.c25{border-left-color:#639922}
+.ri.c26{border-left-color:#BA7517}.ri.c27{border-left-color:#E24B4A}.ri.c28{border-left-color:#7F77DD}
+.ri.c29{border-left-color:#1D9E75}.ri.c30{border-left-color:#533AB7}
+.ri-l{flex:1;min-width:0;}
+.ri-l .nm{font-size:14px;font-weight:700;color:var(--text);}
+.ri-l .fm{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.ri-l .eng-note,.ri-l .warn-note{font-size:11px;color:var(--muted);margin-top:3px;}
+.ri-l .warn-note{color:#c47a00;}
+.ri-l .ast-note{font-size:11px;color:var(--muted);margin-top:5px;padding:5px 8px;background:#fafafa;border-radius:5px;border-left:2px solid #ddd;line-height:1.5;}
+.ri-r{text-align:right;flex-shrink:0;margin-left:14px;}
+.ri-r .ms{font-size:20px;font-weight:700;color:var(--text);}
+.ri-r .ms2{font-size:12px;color:var(--sub);margin-top:2px;}
+.ri-r .ct{font-size:11px;color:var(--muted);margin-top:2px;}
+.ri-r .df{font-size:13px;font-weight:700;margin-top:3px;}
+.up{color:#2d6a1a}.dn{color:#9b1c1c}.eq{color:var(--muted)}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:5px;vertical-align:middle;}
+.b1{background:#e8f5e2;color:#2d6a1a}.b2{background:#e3eefb;color:#1a4a8c}
+.b3{background:#fef3e2;color:#7a4500}.b4{background:#fde8e8;color:#8b1a1a}
+.empty{text-align:center;padding:2.5rem 1rem;font-size:14px;color:var(--muted);}
+.note{font-size:11px;color:var(--muted);margin-top:1rem;line-height:1.8;}
+
+/* 반응형 */
+@media(min-width:480px){
+  .sg{grid-template-columns:repeat(4,1fr);}
+  .ctrl-btns{grid-template-columns:repeat(4,1fr);}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="app-header">
+    <h1>홍대 네오캣 기초디자인반<br>수능 입결 계산기</h1>
+    <p>학교별 반영 영역과 가중치를 적용해 내 환산점수를 계산합니다.</p>
+  </div>
+
+  <div class="sec">내 성적 입력</div>
+  <div class="card">
+    <div class="tabs" id="mtabs">
+      <button class="tab on" onclick="setMode('pct',this)">백분위</button>
+      <button class="tab" onclick="setMode('std',this)">표준점수</button>
+    </div>
+    <div id="std-notice" style="display:none" class="std-notice">표준점수 반영 공식은 아직 입력되지 않았습니다. 참고용으로만 활용하세요.</div>
+    <div class="sg" id="sgrid"></div>
+    <div class="er">
+      <label>영어 등급</label>
+      <select id="eng-g">
+        <option value="">선택 안 함</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sec">비교할 학교 선택</div>
+  <div class="card">
+    <div class="search-row">
+      <input class="search-input" id="search" placeholder="학교 이름 검색..." oninput="filterToggle(this.value)">
+      <span class="sel-info" id="sel-info"></span>
+    </div>
+    <div class="ctrl-btns">
+      <button class="ctrl-btn" onclick="selAll(true)">전체 선택</button>
+      <button class="ctrl-btn" onclick="selAll(false)">전체 해제</button>
+      <button class="ctrl-btn" onclick="selFiltered(true)">검색 선택</button>
+      <button class="ctrl-btn" onclick="selFiltered(false)">검색 해제</button>
+    </div>
+    <div class="tags" id="utags"></div>
+    <div class="no-result" id="no-result" style="display:none">검색 결과가 없습니다.</div>
+  </div>
+
+  <div id="preview-section" style="display:none">
+    <div class="sec">학과 미리보기</div>
+    <div class="preview-area" id="preview-area"></div>
+  </div>
+
+  <button class="btn-calc" onclick="calc()">입결 계산하기</button>
+  <div id="results" style="margin-top:1.25rem"></div>
+</div>
+
+<script>
+// PWA 서비스 워커 등록
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+const COLORS=['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#639922','#BA7517','#888780','#533AB7','#0F6E56','#993C1D','#185FA5','#D4537E','#5DCAA5','#EF9F27','#E24B4A','#7F77DD','#1D9E75','#BA7517','#378ADD','#533AB7','#0F6E56','#D85A30','#185FA5','#D4537E','#639922','#BA7517','#E24B4A','#7F77DD','#1D9E75','#533AB7'];
+
+function scoreTagHTML(t){
+  if(t==='pct')return'<span class="score-tag pct">백분위</span>';
+  if(t==='std')return'<span class="score-tag std">표준점수+자체변환</span>';
+  return'';
+}
+function engTableHTML(engMap){
+  if(!engMap||Object.keys(engMap).length===0)return'';
+  const grades=[1,2,3,4,5,6,7,8,9];
+  return `<div class="eng-grade-table-wrap"><div class="eng-grade-label">영어 등급 → 환산점수</div><div class="eng-grade-scroll"><table class="eng-grade-table"><thead><tr>${grades.map(g=>`<th>${g}등급</th>`).join('')}</tr></thead><tbody><tr>${grades.map(g=>`<td>${engMap[g]??'-'}</td>`).join('')}</tr></tbody></table></div></div>`;
+}
+
+const UNIVS_RAW=[
+  {id:'sookmyung',name:'숙명여자대학교',ci:0,scoreType:'std',cut:null,fd:{pct:'국어×0.4 + 영어등급환산×0.3 + 탐구 상위 1과목×0.3',std:null},engMap:{1:100,2:98,3:94,4:88,5:80,6:70,7:60,8:40,9:20},tableMode:'full',depts:[{type:'수능(일반)',g:'가',rows:[{name:'시각·영상디자인과',cnt:28,rate:'2.89',pct_su:60,pct_silgi:40,pct_etc:null},{name:'산업디자인과',cnt:16,rate:'3.38',pct_su:60,pct_silgi:40,pct_etc:null},{name:'환경디자인과',cnt:15,rate:'5.40',pct_su:60,pct_silgi:40,pct_etc:null},{name:'공예과',cnt:23,rate:'6.09',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){return s.kor*.4+(this.engMap[+s.engG]||0)*.3+Math.max(s.exp1,s.exp2)*.3;},calcStd(){return null;}},
+  {id:'uos',name:'서울시립대학교',ci:1,scoreType:'std',cut:null,fd:{pct:'국어×0.5 + 영어등급(120→100환산)×0.3 + 탐구 2과목 평균×0.2',std:null},engMap:{1:120,2:117,3:108,4:96,5:76,6:60,7:36,8:12,9:0},tableMode:'full',depts:[{type:'실기/실적(일반)\n1단계(6배수)',g:'가',rows:[{name:'시각디자인학과',cnt:15,rate:'5.86',pct_su:100,pct_silgi:null,pct_etc:null},{name:'산업디자인학과',cnt:14,rate:'3.20',pct_su:100,pct_silgi:null,pct_etc:null}]},{type:'실기/실적(일반)\n2단계',g:'가',rows:[{name:'시각디자인학과',cnt:15,rate:'5.86',pct_su:40,pct_silgi:50,pct_etc:'면접10'},{name:'산업디자인학과',cnt:14,rate:'3.20',pct_su:40,pct_silgi:50,pct_etc:'면접10'}]}],calcPct(s){return s.kor*.5+((this.engMap[+s.engG]||0)/120*100)*.3+((s.exp1+s.exp2)/2)*.2;},calcStd(){return null;}},
+  {id:'cau',name:'중앙대(다빈치)',ci:2,scoreType:'std',cut:null,fd:{pct:'국어×0.5 + 탐구 2과목 평균×0.5',std:null},engMap:{},tableMode:'full',depts:[{type:'수능(실기형)',g:'가',rows:[{name:'공예',cnt:20,rate:'8.90',pct_su:60,pct_silgi:40,pct_etc:null},{name:'산업디자인',cnt:20,rate:'4.20',pct_su:60,pct_silgi:40,pct_etc:null},{name:'시각디자인',cnt:20,rate:'3.10',pct_su:60,pct_silgi:40,pct_etc:null},{name:'실내환경디자인',cnt:10,rate:'4.10',pct_su:60,pct_silgi:40,pct_etc:null},{name:'패션디자인',cnt:12,rate:'5.17',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){return s.kor*.5+((s.exp1+s.exp2)/2)*.5;},calcStd(){return null;}},
+  {id:'swu',name:'서울여자대학교',ci:3,scoreType:'pct',cut:null,fd:{pct:'국어·영어·탐구상위1과목 중 우수순 40%+40%+20%',std:null},engMap:{1:100,2:97,3:93,4:85,5:70,6:50,7:35,8:20,9:0},tableMode:'full',depts:[{type:'수능(일반)',g:'가',rows:[{name:'산업디자인학과',cnt:15,rate:'4.53',pct_su:60,pct_silgi:40,pct_etc:null},{name:'공예_컬렉터블디자인학과',cnt:13,rate:'9.31',pct_su:60,pct_silgi:40,pct_etc:null}]},{type:'수능(일반)',g:'나',rows:[{name:'시각디자인학과',cnt:16,rate:'6.31',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,eng,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.4+sc[1]*.4+sc[2]*.2;},calcStd(){return null;}},
+  {id:'skg',name:'서경대학교',ci:4,scoreType:'pct',cut:null,fd:{pct:'국어×0.4 + 영어등급환산×0.2 + 탐구 2과목 평균×0.4',std:null},engMap:{1:100,2:90,3:80,4:70,5:50,6:30,7:20,8:0,9:0},tableMode:'full',depts:[{type:'실기 우수자',g:'가',rows:[{name:'VD_비주얼디자인',cnt:23,rate:'14.74',pct_su:20,pct_silgi:80,pct_etc:null},{name:'LF_라이프스타일디자인',cnt:23,rate:'21.30',pct_su:20,pct_silgi:80,pct_etc:null}]}],calcPct(s){return s.kor*.4+(this.engMap[+s.engG]||0)*.2+((s.exp1+s.exp2)/2)*.4;},calcStd(){return null;}},
+  {id:'hansei',name:'한세대학교',ci:5,scoreType:'pct',cut:null,fd:{pct:'국어×0.4 + 영어등급환산×0.3 + 탐구 상위 1과목×0.3',std:null},engMap:{1:100,2:95,3:88,4:79,5:68,6:55,7:40,8:25,9:10},tableMode:'full',depts:[{type:'실기/실적 일반(디자인)',g:'가',rows:[{name:'디자인학부',cnt:45,rate:'9.54',pct_su:30,pct_silgi:70,pct_etc:null}]}],calcPct(s){return s.kor*.4+(this.engMap[+s.engG]||0)*.3+Math.max(s.exp1,s.exp2)*.3;},calcStd(){return null;}},
+  {id:'khu',name:'경희대(국제)',ci:6,scoreType:'std',cut:null,fd:{pct:'국어×0.6 + 탐구 상위 1과목×0.4',std:null},engDeductMap:{1:0,2:0,3:-2,4:-4,5:-8,6:-12,7:-18,8:-24,9:-30},engMap:{},tableMode:'full',depts:[{type:'실기(실기위주)',g:'나',rows:[{name:'시각디자인학과',cnt:8,rate:'11.50',pct_su:40,pct_silgi:60,pct_etc:null},{name:'의류디자인학과',cnt:7,rate:'13.14',pct_su:40,pct_silgi:60,pct_etc:null},{name:'디지털콘텐츠학과',cnt:11,rate:'13.36',pct_su:40,pct_silgi:60,pct_etc:null}]}],engNote(g){const d=this.engDeductMap[+g];if(!g||d===undefined)return'';return d===0?'영어 감점 없음':`영어 ${d}점 감점 적용`;},calcPct(s){return s.kor*.6+Math.max(s.exp1,s.exp2)*.4+(this.engDeductMap[+s.engG]||0);},calcStd(){return null;}},
+  {id:'duksungw',name:'덕성여자대학교',ci:7,scoreType:'pct',cut:null,fd:{pct:'국어·영어·수학·탐구상위1과목 중 상위 2개 영역 50%+50%',std:null},engMap:{1:100,2:98,3:96,4:80,5:70,6:60,7:50,8:40,9:0},tableMode:'full',depts:[{type:'미술실기',g:'나',rows:[{name:'Art&Design대학',cnt:23,rate:'19.58',pct_su:20,pct_silgi:80,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.5+sc[1]*.5;},calcStd(){return null;}},
+  {id:'inha',name:'인하대학교',ci:8,scoreType:'std',cut:null,fd:{pct:'국어×0.4 + 영어등급(150→100환산)×0.4 + 탐구 2과목 평균×0.2',std:null},engMap:{1:150,2:148,3:145,4:143,5:120,6:100,7:80,8:40,9:0},tableMode:'full',depts:[{type:'실기/실적',g:'나',rows:[{name:'디자인융합학과',cnt:12,rate:'21.67',pct_su:30,pct_silgi:70,pct_etc:null}]},{type:'실기/실적',g:'다',rows:[{name:'조형예술학과(자유소묘)',cnt:12,rate:'15.17',pct_su:30,pct_silgi:70,pct_etc:null},{name:'의류디자인학과(실기)',cnt:10,rate:'34.70',pct_su:30,pct_silgi:70,pct_etc:null},{name:'디자인테크놀로지학과',cnt:20,rate:'9.65',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){return s.kor*.4+((this.engMap[+s.engG]||0)/150*100)*.4+((s.exp1+s.exp2)/2)*.2;},calcStd(){return null;}},
+  {id:'smuc',name:'상명대학교(천안)',ci:9,scoreType:'pct',cut:null,fd:{pct:'국어×0.4 + 영어등급환산×0.4 + 탐구 상위 1과목×0.2',std:null},engMap:{1:100,2:98,3:96,4:94,5:90,6:80,7:60,8:40,9:0},tableMode:'full',depts:[{type:'실기/실적(실기)',g:'나',rows:[{name:'디자인학부(AR·VR제외)',cnt:61,rate:'6.90',pct_su:40,pct_silgi:60,pct_etc:null},{name:'무대미술',cnt:12,rate:'5.58',pct_su:40,pct_silgi:60,pct_etc:null},{name:'디지털만화영상',cnt:12,rate:'7.67',pct_su:40,pct_silgi:60,pct_etc:null},{name:'AI미디어콘텐츠',cnt:9,rate:'6.56',pct_su:40,pct_silgi:60,pct_etc:null}]}],calcPct(s){return s.kor*.4+(this.engMap[+s.engG]||0)*.4+Math.max(s.exp1,s.exp2)*.2;},calcStd(){return null;}},
+  {id:'seoultech',name:'서울과학기술대학교',ci:10,scoreType:'std',cut:null,fd:{pct:'국어×0.4 + 영어등급(135→100환산)×0.25 + 탐구 2과목 평균×0.35',std:null},engMap:{1:135,2:132,3:128,4:120,5:100,6:80,7:60,8:30,9:0},tableMode:'full',depts:[{type:'일반(실기)\n1단계(6배수)',g:'나',rows:[{name:'산업디자인',cnt:26,rate:'4.12',pct_su:100,pct_silgi:null,pct_etc:null},{name:'시각디자인',cnt:30,rate:'3.88',pct_su:100,pct_silgi:null,pct_etc:null},{name:'금속공예디자인',cnt:19,rate:'6.21',pct_su:100,pct_silgi:null,pct_etc:null},{name:'도예학과',cnt:20,rate:'6.29',pct_su:100,pct_silgi:null,pct_etc:null}]},{type:'일반(실기)\n2단계',g:'나',rows:[{name:'산업디자인',cnt:26,rate:'4.12',pct_su:60,pct_silgi:40,pct_etc:null},{name:'시각디자인',cnt:30,rate:'3.88',pct_su:60,pct_silgi:40,pct_etc:null},{name:'금속공예디자인',cnt:19,rate:'6.21',pct_su:60,pct_silgi:40,pct_etc:null},{name:'도예학과',cnt:20,rate:'6.29',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){return s.kor*.4+((this.engMap[+s.engG]||0)/135*100)*.25+((s.exp1+s.exp2)/2)*.35;},calcStd(){return null;}},
+  {id:'iccu',name:'인천가톨릭대학교',ci:11,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어·탐구2과목평균 중 상위 2개 영역 50%+50%',std:null},engMap:{1:100,2:95,3:90,4:85,5:80,6:70,7:60,8:30,9:0},tableMode:'simple',depts:[{g:'나',rows:[{name:'융합디자인',cnt:6}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,(s.exp1+s.exp2)/2].sort((a,b)=>b-a);return sc[0]*.5+sc[1]*.5;},calcStd(){return null;}},
+  {id:'yonsei_mirae',name:'연세대학교(미래)',ci:12,scoreType:'std',cut:null,fd:{pct:'국어×0.667 + 영어등급환산×0.333',std:null},engMap:{1:100,2:95,3:90,4:80,5:70,6:60,7:40,8:20,9:0},tableMode:'full',depts:[{type:'실기/실적',g:'나',rows:[{name:'디자인예술학부',cnt:30,rate:'8.10',pct_su:30,pct_silgi:70,pct_etc:null}]}],calcPct(s){return s.kor*(2/3)+(this.engMap[+s.engG]||0)*(1/3);},calcStd(){return null;}},
+  {id:'dankook_jj',name:'단국대학교(죽전)',ci:13,scoreType:'pct',cut:null,fd:{pct:'국어×0.5 + 영어등급환산×0.2 + 탐구 2과목 평균×0.3',std:null},engMap:{1:100,2:98,3:95,4:85,5:70,6:40,7:15,8:5,9:0},tableMode:'full',depts:[{type:'실기/실적(일반)',g:'다',rows:[{name:'도예과',cnt:10,rate:'15.30',pct_su:40,pct_silgi:60,pct_etc:null},{name:'커뮤니케이션디자인',cnt:20,rate:'12.35',pct_su:40,pct_silgi:60,pct_etc:null},{name:'패션산업디자인',cnt:10,rate:'15.30',pct_su:40,pct_silgi:60,pct_etc:null}]}],calcPct(s){return s.kor*.5+(this.engMap[+s.engG]||0)*.2+((s.exp1+s.exp2)/2)*.3;},calcStd(){return null;}},
+  {id:'dankook_ca',name:'단국대학교(천안)',ci:14,scoreType:'pct',cut:null,fd:{pct:'국어×0.4 + 영어등급환산×0.4 + 탐구 상위 1과목×0.2',std:null},engMap:{1:100,2:98,3:95,4:85,5:70,6:40,7:15,8:5,9:0},tableMode:'full',depts:[{type:'실기/실적위주(일반)',g:'다',rows:[{name:'공예(금속·섬유)',cnt:15,rate:'14.80',pct_su:30,pct_silgi:70,pct_etc:null}]}],calcPct(s){return s.kor*.4+(this.engMap[+s.engG]||0)*.4+Math.max(s.exp1,s.exp2)*.2;},calcStd(){return null;}},
+  {id:'dongduk',name:'동덕여자대학교',ci:15,scoreType:'pct',cut:null,fd:{pct:'국어·수학 중 높은 백분위 33.3% + 영어등급환산 33.3% + 탐구 상위 1과목 33.3%',std:null},warnNote:'※ 동덕여대는 국어·수학을 백분위로 반영',engMap:{1:100,2:99,3:96,4:85,5:70,6:55,7:40,8:20,9:0},tableMode:'full',depts:[{type:'실기우수자',g:'다',rows:[{name:'디지털공예전공',cnt:11,rate:'10.36',pct_su:60,pct_silgi:40,pct_etc:null},{name:'패션디자인전공(주)',cnt:16,rate:'8.25',pct_su:60,pct_silgi:40,pct_etc:null},{name:'시각&실내(시각디자인)',cnt:23,rate:'8.58',pct_su:60,pct_silgi:40,pct_etc:null},{name:'시각&실내(실내디자인)',cnt:null,rate:'9.45',pct_su:60,pct_silgi:40,pct_etc:null},{name:'미디어디자인전공',cnt:12,rate:'7.83',pct_su:60,pct_silgi:40,pct_etc:null},{name:'패션디자인전공(야)',cnt:15,rate:'10.93',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;return Math.max(s.kor,s.mat)*(1/3)+eng*(1/3)+Math.max(s.exp1,s.exp2)*(1/3);},calcStd(){return null;}},
+  {id:'sungshin',name:'성신여자대학교',ci:16,scoreType:'pct',cut:null,fd:{pct:'국어·영어·수학·탐구2과목평균 중 상위 3개 영역 각 33.3%',std:null},engMap:{1:100,2:97,3:94,4:85,5:60,6:40,7:25,8:10,9:0},tableMode:'full',depts:[{type:'일반',g:'나',rows:[{name:'공예과',cnt:20,rate:'-',pct_su:55,pct_silgi:45,pct_etc:null}]},{type:'일반',g:'다',rows:[{name:'디자인과',cnt:36,rate:'14.14',pct_su:55,pct_silgi:45,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,(s.exp1+s.exp2)/2].sort((a,b)=>b-a);return (sc[0]+sc[1]+sc[2])*(1/3);},calcStd(){return null;}},
+  {id:'konkuk_glocal',name:'건국대학교(글로컬)',ci:17,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어·탐구상위1과목 중 상위 2개 영역 50%+50%',std:null},engMap:{1:95,2:90,3:85,4:80,5:75,6:40,7:30,8:20,9:0},tableMode:'full',depts:[{type:'일반(실기)',g:'다',rows:[{name:'디자인조형자유전공학부',cnt:52,rate:'9.42',pct_su:40,pct_silgi:60,pct_etc:null},{name:'산업디자인학과',cnt:7,rate:'8.71',pct_su:40,pct_silgi:60,pct_etc:null},{name:'실내디자인학과',cnt:7,rate:'7.57',pct_su:40,pct_silgi:60,pct_etc:null},{name:'패션디자인학과',cnt:7,rate:'8.00',pct_su:40,pct_silgi:60,pct_etc:null},{name:'시각영상디자인학과',cnt:12,rate:'8.58',pct_su:40,pct_silgi:60,pct_etc:null},{name:'미디어콘텐츠학과',cnt:7,rate:'9.43',pct_su:40,pct_silgi:60,pct_etc:null},{name:'조형예술학과',cnt:8,rate:'15.50',pct_su:40,pct_silgi:60,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.5+sc[1]*.5;},calcStd(){return null;}},
+  {id:'kangnam',name:'강남대학교',ci:18,scoreType:'pct',cut:null,fd:{pct:'국어·수학 중 상위 40% + 하위 20% + 영어등급환산×0.2 + 탐구 상위 1과목×0.2',std:null},engMap:{1:100,2:95,3:90,4:80,5:70,6:50,7:30,8:10,9:0},tableMode:'full',depts:[{type:'실기/실적위주(일반)',g:'다',rows:[{name:'디자인학과',cnt:20,rate:'4.85',pct_su:40,pct_silgi:60,pct_etc:null}]}],calcPct(s){const km=[s.kor,s.mat].sort((a,b)=>b-a);const eng=this.engMap[+s.engG]||0;return km[0]*.4+km[1]*.2+eng*.2+Math.max(s.exp1,s.exp2)*.2;},calcStd(){return null;}},
+  {id:'myongji',name:'명지대학교(서울)',ci:19,scoreType:'pct',cut:null,fd:{pct:'국어×0.35 + 영어등급환산×0.35 + (수학·탐구상위1 중 높은 영역)×0.3',std:null},engMap:{1:100,2:98,3:96,4:90,5:80,6:60,7:40,8:20,9:0},tableMode:'full',depts:[{type:'실기',g:'다',rows:[{name:'디지털콘텐츠디자인학과',cnt:8,rate:'8.88',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const best=Math.max(s.mat,s.exp1,s.exp2);return s.kor*.35+eng*.35+best*.3;},calcStd(){return null;},extraScore(s){const eng=this.engMap[+s.engG]||0;const best=Math.max(s.mat,s.exp1,s.exp2);return (s.kor*.35+eng*.35+best*.3)*6;}},
+  {id:'hanyang_erica',name:'한양대학교(ERICA)',ci:20,scoreType:'std',cut:null,fd:{pct:'국어×0.35 + 영어등급환산×0.35 + (탐구상위1·수학 중 높은 영역)×0.3',std:null},engMap:{1:100,2:99,3:96,4:91,5:80,6:60,7:40,8:20,9:0},tableMode:'full',depts:[{type:'실기/실적\n1단계(5배수)',g:'가',rows:[{name:'디자인계열',cnt:80,rate:'6.09',pct_su:100,pct_silgi:null,pct_etc:null}]},{type:'실기/실적\n2단계',g:'가',rows:[{name:'디자인계열',cnt:80,rate:'6.09',pct_su:null,pct_silgi:80,pct_etc:'1단계성적20'}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const best=Math.max(s.mat,s.exp1,s.exp2);return s.kor*.35+eng*.35+best*.3;},calcStd(){return null;}},
+  {id:'konkuk_seoul',name:'건국대학교(서울)',ci:21,scoreType:'std',cut:null,fd:{pct:'국어×0.45 + 영어등급(200→100환산)×0.25 + (탐구2평균·수학 중 높은 영역)×0.3',std:null},engMap:{1:200,2:197,3:194,4:190,5:185,6:180,7:170,8:160,9:150},tableMode:'full',depts:[{type:'수능(KU일반)',g:'나',rows:[{name:'커뮤니케이션디자인학과',cnt:39,rate:'11.62',pct_su:60,pct_silgi:40,pct_etc:null},{name:'의상디자인학과(예체능계)',cnt:17,rate:'11.06',pct_su:60,pct_silgi:40,pct_etc:null},{name:'리빙디자인학과',cnt:45,rate:'14.51',pct_su:60,pct_silgi:40,pct_etc:null}]},{type:'수능(KU일반)',g:'다',rows:[{name:'산업디자인학과',cnt:34,rate:'14.15',pct_su:60,pct_silgi:40,pct_etc:null},{name:'영상학과',cnt:35,rate:'10.43',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){const eng=(this.engMap[+s.engG]||0)/200*100;const best=Math.max((s.exp1+s.exp2)/2,s.mat);return s.kor*.45+eng*.25+best*.3;},calcStd(){return null;}},
+  {id:'suwon',name:'수원대학교',ci:22,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어·탐구상위1과목 중 우수한 2개 영역 각 50%',std:null},engMap:{1:100,2:97,3:94,4:91,5:88,6:81,7:71,8:56,9:41},tableMode:'full',depts:[{type:'실기(실기우수자)',g:'나',rows:[{name:'커뮤니케이션디자인',cnt:17,rate:'18.94',pct_su:20,pct_silgi:80,pct_etc:null},{name:'패션디자인',cnt:10,rate:'17.10',pct_su:20,pct_silgi:80,pct_etc:null},{name:'공예디자인',cnt:8,rate:'20.88',pct_su:20,pct_silgi:80,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.5+sc[1]*.5;},calcStd(){return null;}},
+  {id:'skku',name:'성균관대학교',ci:23,scoreType:'std',cut:null,fd:{pct:'국어×0.5 + 탐구 2과목 평균×0.5 (백분위 간이 계산)',std:null},asteriskNote:'* 실제 성적은 국어45% + 영어(변환표준점수)10% + 탐구 2과목 평균45%로 계산됩니다.',engMap:{},tableMode:'full',depts:[{type:'일반',g:'가',rows:[{name:'디자인학과',cnt:38,rate:'4.34',pct_su:60,pct_silgi:40,pct_etc:null}]}],calcPct(s){return s.kor*.5+((s.exp1+s.exp2)/2)*.5;},calcStd(){return null;}},
+  {id:'cheongju',name:'청주대학교',ci:24,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어·탐구2과목평균 중 상위 3개 영역 각 33.3%',std:null},engMap:{1:100,2:95,3:85,4:75,5:65,6:50,7:40,8:20,9:10},tableMode:'full',depts:[{type:'예체능',g:'가',rows:[{name:'공예디자인학과',cnt:12,rate:'5.30',pct_su:20,pct_silgi:80,pct_etc:null},{name:'만화애니메이션학과',cnt:6,rate:'5.40',pct_su:20,pct_silgi:80,pct_etc:null},{name:'산업디자인학과',cnt:4,rate:'5.50',pct_su:30,pct_silgi:70,pct_etc:null}]},{type:'예체능',g:'나',rows:[{name:'시각디자인학과',cnt:12,rate:'6.23',pct_su:30,pct_silgi:70,pct_etc:null}]},{type:'예체능',g:'다',rows:[{name:'아트앤패션디자인학과',cnt:9,rate:'6.10',pct_su:20,pct_silgi:80,pct_etc:null},{name:'디지털미디어디자인학과',cnt:15,rate:'7.56',pct_su:30,pct_silgi:70,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,(s.exp1+s.exp2)/2].sort((a,b)=>b-a);return (sc[0]+sc[1]+sc[2])*(1/3);},calcStd(){return null;}},
+  {id:'hyupsung',name:'협성대학교',ci:25,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어·탐구상위1과목 중 우수한 2개 영역 각 50%',std:null},engMap:{1:100,2:90,3:87,4:79,5:70,6:60,7:50,8:30,9:20},tableMode:'full',depts:[{type:'실기우수자',g:'나',rows:[{name:'가구디자인학과',cnt:7,rate:'9.86',pct_su:20,pct_silgi:80,pct_etc:null},{name:'실내디자인학과',cnt:10,rate:'7.10',pct_su:30,pct_silgi:70,pct_etc:null},{name:'산업디자인학과',cnt:12,rate:'7.10',pct_su:30,pct_silgi:70,pct_etc:null},{name:'시각디자인학과',cnt:12,rate:'6.67',pct_su:30,pct_silgi:70,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.5+sc[1]*.5;},calcStd(){return null;}},
+  {id:'namseo',name:'남서울대학교',ci:26,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어·탐구상위1과목 중 우수한 2개 영역 각 50%',std:null},engMap:{1:100,2:85,3:70,4:50,5:30,6:10,7:5,8:3,9:0},tableMode:'full',depts:[{type:'실기/실적위주(일반)',g:'가',rows:[{name:'시각미디어디자인학과',cnt:30,rate:'9.04',pct_su:20,pct_silgi:80,pct_etc:null},{name:'공간조형디자인학과',cnt:26,rate:'7.81',pct_su:20,pct_silgi:80,pct_etc:null},{name:'영상예술디자인학과',cnt:26,rate:'10.63',pct_su:20,pct_silgi:80,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,eng,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.5+sc[1]*.5;},calcStd(){return null;}},
+  {id:'baekseok',name:'백석대학교',ci:27,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어 중 상위 2개 영역 각 40% + 탐구 상위 1과목 20%',std:null},engMap:{1:100,2:95,3:90,4:80,5:60,6:50,7:40,8:30,9:20},tableMode:'full',depts:[{type:'일반학생',g:'나',rows:[{name:'디자인영상학부(영상애니·시각·산업·인테리어)',cnt:65,rate:'11.94',pct_su:20,pct_silgi:80,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const top2=[s.kor,s.mat,eng].sort((a,b)=>b-a).slice(0,2);return top2[0]*.4+top2[1]*.4+Math.max(s.exp1,s.exp2)*.2;},calcStd(){return null;}},
+  {id:'kyonggi',name:'경기대학교',ci:28,scoreType:'pct',cut:null,fd:{pct:'국어·수학·탐구상위1과목 중 상위 2개 영역 각 35% + 영어등급환산×0.3',std:null},engMap:{1:100,2:100,3:96,4:92,5:80,6:70,7:60,8:50,9:0},tableMode:'full',depts:[{type:'실기/실적(일반학생)',g:'다',rows:[{name:'입체조형학과',cnt:7,rate:'30.33',pct_su:30,pct_silgi:70,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const sc=[s.kor,s.mat,Math.max(s.exp1,s.exp2)].sort((a,b)=>b-a);return sc[0]*.35+sc[1]*.35+eng*.3;},calcStd(){return null;}},
+  {id:'hankyong',name:'국립 한경대학교',ci:29,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어 중 상위 2개 영역 각 40% + 탐구 상위 1과목 20%',std:null},engMap:{1:100,2:90,3:80,4:70,5:60,6:50,7:40,8:30,9:20},tableMode:'full',depts:[{type:'실기위주(일반)',g:'다',rows:[{name:'시각미디어디자인(안성)',cnt:40,rate:'7.03',pct_su:40,pct_silgi:60,pct_etc:null},{name:'제품공간디자인(평택)',cnt:3,rate:'6.33',pct_su:40,pct_silgi:60,pct_etc:null}]},{type:'수능위주(일반)',g:'다',rows:[{name:'귀금속보석공예(평택)',cnt:2,rate:'18.50',pct_su:100,pct_silgi:null,pct_etc:null}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const top2=[s.kor,s.mat,eng].sort((a,b)=>b-a).slice(0,2);return top2[0]*.4+top2[1]*.4+Math.max(s.exp1,s.exp2)*.2;},calcStd(){return null;}},
+  {id:'hoseo',name:'호서대학교',ci:30,scoreType:'pct',cut:null,fd:{pct:'국어·수학·영어 중 상위 2개 영역 각 35% + 탐구 상위 1과목 30%',std:null},engMap:{1:95,2:85,3:75,4:65,5:50,6:35,7:20,8:0,9:0},tableMode:'full',depts:[{type:'실기/실적(실기)',g:'가',rows:[{name:'시각디자인',cnt:null,rate:null,pct_su:20,pct_silgi:80,pct_etc:null},{name:'산업디자인',cnt:null,rate:null,pct_su:20,pct_silgi:80,pct_etc:null},{name:'실내디자인',cnt:null,rate:null,pct_su:20,pct_silgi:80,pct_etc:null},{name:'디지털프로덕트디자인',cnt:null,rate:null,pct_su:20,pct_silgi:80,pct_etc:null,note:'4개 학과 합산 45명 / 9.84'}]}],calcPct(s){const eng=this.engMap[+s.engG]||0;const top2=[s.kor,s.mat,eng].sort((a,b)=>b-a).slice(0,2);return top2[0]*.35+top2[1]*.35+Math.max(s.exp1,s.exp2)*.3;},calcStd(){return null;}}
+];
+
+const UNIVS=[...UNIVS_RAW].sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+
+function deptTableHTML(u){
+  if(u.tableMode==='full'){
+    const tables=u.depts.map(g=>{
+      const gLabel=g.g?`<div class="dept-group-label">${g.g}군</div>`:'';
+      const rows=g.rows.map((r,i)=>{
+        const typeText=g.type.replace(/\n/g,'<br>');
+        const typeCell=i===0?`<td rowspan="${g.rows.length}" style="border-right:1px solid #f0f0f0;font-size:11px;color:#999;text-align:center;vertical-align:middle">${typeText}</td>`:'';
+        const noteHtml=r.note?`<br><span style="font-size:10px;color:#bbb">${r.note}</span>`:'';
+        return `<tr>${typeCell}<td class="ta-l">${r.name}${noteHtml}</td><td>${r.cnt??'-'}</td><td>${r.rate||'-'}</td><td>${r.pct_su!=null?r.pct_su+'%':'-'}</td><td>${r.pct_silgi!=null?r.pct_silgi+'%':'-'}</td><td>${r.pct_etc||'-'}</td></tr>`;
+      }).join('');
+      return `${gLabel}<div class="table-scroll"><table class="dept-table"><thead><tr><th style="width:20%">전형구분</th><th class="ta-l" style="width:26%">학과</th><th style="width:8%">모집</th><th style="width:12%">경쟁률</th><th style="width:10%">수능%</th><th style="width:10%">실기%</th><th style="width:14%">기타</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }).join('');
+    const astHtml=u.asteriskNote?`<div class="asterisk-note">${u.asteriskNote}</div>`:'';
+    return tables+astHtml+engTableHTML(u.engMap);
+  }
+  const s=u.depts.map(g=>{
+    const label=g.g?`<div class="dept-group-label">${g.g}군</div>`:'';
+    const rows=g.rows.map(r=>`<tr><td class="ta-l">${r.name}</td><td>${r.cnt!=null?r.cnt+'명':'-'}</td></tr>`).join('');
+    return `${label}<table class="dept-table" style="width:auto;min-width:180px"><thead><tr><th class="ta-l">학과</th><th>모집인원</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }).join('');
+  return s+engTableHTML(u.engMap);
+}
+
+const sel={};
+UNIVS.forEach(u=>sel[u.id]=false);
+let mode='pct',query='';
+function matchQ(u){return !query||u.name.includes(query);}
+function buildTags(){document.getElementById('utags').innerHTML=UNIVS.map(u=>`<div class="utag${sel[u.id]?' on':''} ${matchQ(u)?'':'hidden'}" id="tog-${u.id}" onclick="toggleU('${u.id}',this)"><span class="dot"></span>${u.name}</div>`).join('');updateInfo();}
+buildTags();
+function toggleU(id,el){sel[id]=!sel[id];el.classList.toggle('on',sel[id]);updateInfo();renderPreview();}
+function updateInfo(){const on=UNIVS.filter(u=>sel[u.id]).length;document.getElementById('sel-info').textContent=`${on}/${UNIVS.length}개 선택`;}
+function selAll(on){UNIVS.forEach(u=>{sel[u.id]=on;const el=document.getElementById('tog-'+u.id);if(el)el.classList.toggle('on',on);});updateInfo();renderPreview();}
+function selFiltered(on){UNIVS.filter(u=>matchQ(u)).forEach(u=>{sel[u.id]=on;const el=document.getElementById('tog-'+u.id);if(el)el.classList.toggle('on',on);});updateInfo();renderPreview();}
+function filterToggle(q){query=q.trim();UNIVS.forEach(u=>{const el=document.getElementById('tog-'+u.id);if(el)el.classList.toggle('hidden',!matchQ(u));});document.getElementById('no-result').style.display=UNIVS.some(u=>matchQ(u))?'none':'block';}
+function togglePreviewBody(id){const body=document.getElementById('pb-'+id);const chev=document.getElementById('pc-'+id);if(!body)return;const open=body.classList.toggle('open');chev.textContent=open?'▲':'▼';}
+function renderPreview(){
+  const active=UNIVS.filter(u=>sel[u.id]);
+  const section=document.getElementById('preview-section');
+  if(!active.length){section.style.display='none';return;}
+  section.style.display='block';
+  document.getElementById('preview-area').innerHTML=active.map(u=>`
+    <div class="preview-item" style="border-left-color:${COLORS[u.ci]}">
+      <div class="preview-header" onclick="togglePreviewBody('${u.id}')">
+        <div class="preview-header-left">
+          <div class="preview-univ">${u.name}</div>
+          <div class="preview-formula">${u.fd.pct}</div>
+          ${scoreTagHTML(u.scoreType)}
+        </div>
+        <span class="preview-chevron" id="pc-${u.id}">▼</span>
+      </div>
+      <div class="preview-body" id="pb-${u.id}">${deptTableHTML(u)}</div>
+    </div>`).join('');
+}
+function setMode(m,btn){mode=m;document.querySelectorAll('#mtabs .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('std-notice').style.display=m==='std'?'block':'none';buildGrid();}
+function buildGrid(){
+  const lbl=mode==='pct'?'백분위':'표준점수',mx=mode==='pct'?100:200,ph=mode==='pct'?'0~100':'0~200';
+  document.getElementById('sgrid').innerHTML=[['kor','국어'],['mat','수학'],['exp1','탐구 1'],['exp2','탐구 2']].map(([id,nm])=>`<div class="sc"><label>${nm} ${lbl}</label><input type="number" id="s-${id}" min="0" max="${mx}" placeholder="${ph}" inputmode="numeric"></div>`).join('');
+}
+buildGrid();
+function getS(){const n=id=>parseFloat(document.getElementById(id)?.value)||0;return{kor:n('s-kor'),mat:n('s-mat'),exp1:n('s-exp1'),exp2:n('s-exp2'),engG:document.getElementById('eng-g').value};}
+function badge(d){if(d===null)return'';if(d>=10)return'<span class="badge b1">안정</span>';if(d>=0)return'<span class="badge b2">적정</span>';if(d>=-15)return'<span class="badge b3">소신</span>';return'<span class="badge b4">도전</span>';}
+function calc(){
+  const s=getS();const active=UNIVS.filter(u=>sel[u.id]);
+  if(!active.length){document.getElementById('results').innerHTML='<div class="empty">학교를 하나 이상 선택해주세요.</div>';return;}
+  const rows=active.map(u=>{const t=mode==='pct'?u.calcPct(s):u.calcStd(s);return{u,t,diff:t!==null&&u.cut!==null?t-u.cut:null};}).sort((a,b)=>(b.t||0)-(a.t||0));
+  let html=`<div class="sec">계산 결과 (${mode==='pct'?'백분위':'표준점수'} 기준)</div>`;
+  rows.forEach(({u,t,diff})=>{
+    const noStd=mode==='std'&&t===null;
+    const ds=diff!==null?(diff>0?`+${diff.toFixed(1)}`:diff.toFixed(1))+'점':'';
+    const dc=diff===null?'eq':diff>0?'up':diff<0?'dn':'eq';
+    const en=u.engNote?`<div class="eng-note">${u.engNote(s.engG)}</div>`:'';
+    const wn=u.warnNote?`<div class="warn-note">${u.warnNote}</div>`:'';
+    const ast=u.asteriskNote?`<div class="ast-note">${u.asteriskNote}</div>`:'';
+    const fdText=mode==='pct'?u.fd.pct:(u.fd.std||'표준점수 공식 미입력');
+    const extra=u.extraScore&&mode==='pct'?`<div class="ms2">600점 기준: ${u.extraScore(s).toFixed(1)}점</div>`:'';
+    html+=`<div class="ri c${u.ci}"><div class="ri-l"><div class="nm">${u.name}${diff!==null?badge(diff):''}</div><div class="fm">${fdText}</div>${en}${wn}${ast}</div><div class="ri-r"><div class="ms">${noStd?'—':t!==null?t.toFixed(1)+'점':'—'}</div>${extra}<div class="ct">${u.cut!==null?`입결 ${u.cut}점`:'입결 미입력'}</div>${diff!==null?`<div class="df ${dc}">${ds}</div>`:''}</div></div>`;
+  });
+  html+=`<div class="note">※ 입결 기준점수는 추후 업데이트 예정입니다.<br>※ 계산 결과는 참고용이며 실제 합격선과 다를 수 있습니다.</div>`;
+  document.getElementById('results').innerHTML=html;
+}
+</script>
+</body>
+</html>

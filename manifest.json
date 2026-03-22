@@ -1,0 +1,25 @@
+{
+  "name": "홍대 네오캣 기초디자인반 수능 입결 계산기",
+  "short_name": "네오캣수능계산기",
+  "description": "예체능 수험생을 위한 학교별 수능 환산점수 계산기",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
